@@ -51,7 +51,7 @@ services:
       - PGUSER=${POSTGRES_USER:-ac}
       - PGPASSWORD=${POSTGRES_PASSWORD}
       - PGHOST=postgres
-      - PGDATABASE=${POSTGRES_DB:-accessconcierge}
+      - PGDATABASE=${POSTGRES_DB:-tenantfloe}
     command: >
       bash -c "
         pg_basebackup -h postgres -U repl_user -D /var/lib/postgresql/data -P -Xs -R

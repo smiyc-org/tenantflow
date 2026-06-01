@@ -63,7 +63,7 @@ export const config = {
   },
 
   email: {
-    from: optional('SMTP_FROM', 'access-concierge@corp.local'),
+    from: optional('SMTP_FROM', 'tenantfloe@corp.local'),
     smtpHost: optional('SMTP_HOST'),
     smtpPort: optionalInt('SMTP_PORT', 587),
     smtpUser: optional('SMTP_USER'),

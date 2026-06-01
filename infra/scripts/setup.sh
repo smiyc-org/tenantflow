@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "=== Access Concierge Setup ==="
+echo "=== TenantFloe Setup ==="
 
 # Generate self-signed TLS cert for nginx (replace with real cert in production)
 mkdir -p infra/nginx/ssl
@@ -9,7 +9,7 @@ if [ ! -f infra/nginx/ssl/server.crt ]; then
   openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -keyout infra/nginx/ssl/server.key \
     -out infra/nginx/ssl/server.crt \
-    -subj "/CN=access-concierge/O=TenantFlow" 2>/dev/null
+    -subj "/CN=tenantfloe/O=TenantFlow" 2>/dev/null
   echo "✓ Generated self-signed TLS certificate (replace with CA-signed cert for production)"
 fi
 
@@ -19,7 +19,7 @@ if [ ! -f infra/certs/entra.pem ]; then
   openssl req -x509 -nodes -days 730 -newkey rsa:4096 \
     -keyout infra/certs/entra.key \
     -out infra/certs/entra.crt \
-    -subj "/CN=access-concierge-app" 2>/dev/null
+    -subj "/CN=tenantfloe-app" 2>/dev/null
   cat infra/certs/entra.crt infra/certs/entra.key > infra/certs/entra.pem
   THUMBPRINT=$(openssl x509 -in infra/certs/entra.crt -fingerprint -sha1 -noout | sed 's/SHA1 Fingerprint=//' | tr -d ':')
   echo "✓ Generated Entra app certificate"

@@ -2,7 +2,7 @@
   "name": "tenantflow",
   "version": "1.0.0",
   "private": true,
-  "description": "Access Concierge — customer-hosted M365 access governance platform",
+  "description": "TenantFloe — customer-hosted M365 access governance platform",
   "workspaces": [
     "apps/*",
     "packages/*"

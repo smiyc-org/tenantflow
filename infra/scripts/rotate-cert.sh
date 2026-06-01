@@ -4,7 +4,7 @@ set -euo pipefail
 CERT_DIR="${CERT_DIR:-infra/certs}"
 DAYS="${DAYS:-730}"
 
-echo "=== Access Concierge — Certificate Rotation ==="
+echo "=== TenantFloe — Certificate Rotation ==="
 
 # Generate new certificate
 NEW_KEY="${CERT_DIR}/entra_new.key"
@@ -13,7 +13,7 @@ NEW_CRT="${CERT_DIR}/entra_new.crt"
 openssl req -x509 -nodes -days "${DAYS}" -newkey rsa:4096 \
   -keyout "${NEW_KEY}" \
   -out "${NEW_CRT}" \
-  -subj "/CN=access-concierge-app" 2>/dev/null
+  -subj "/CN=tenantfloe-app" 2>/dev/null
 
 THUMBPRINT=$(openssl x509 -in "${NEW_CRT}" -fingerprint -sha1 -noout \
   | sed 's/SHA1 Fingerprint=//' | tr -d ':')

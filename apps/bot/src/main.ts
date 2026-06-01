@@ -26,5 +26,5 @@ app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
 const port = parseInt(process.env['PORT'] ?? '3978', 10);
 app.listen(port, '0.0.0.0', () => {
-  console.log(`Access Concierge Bot listening on port ${port}`);
+  console.log(`TenantFloe Bot listening on port ${port}`);
 });

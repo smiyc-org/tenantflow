@@ -1,4 +1,4 @@
--- Access Concierge — Initial Schema
+-- TenantFloe — Initial Schema
 -- Migration 001
 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
@@ -56,7 +56,7 @@ CREATE SEQUENCE request_number_seq START 1;
 CREATE TABLE requests (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   request_number    VARCHAR(32)   UNIQUE NOT NULL DEFAULT (
-    'AC-' || to_char(now(), 'YYYY') || '-' || lpad(nextval('request_number_seq')::text, 6, '0')
+    'TF-' || to_char(now(), 'YYYY') || '-' || lpad(nextval('request_number_seq')::text, 6, '0')
   ),
   status            VARCHAR(32)   NOT NULL DEFAULT 'DRAFT',
   requester_id      UUID          NOT NULL REFERENCES users(id),

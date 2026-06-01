@@ -67,7 +67,7 @@ export class JiraAdapter implements ITicketAdapter {
             },
           ],
         },
-        labels: ['access-concierge', input.workloadType.toLowerCase()],
+        labels: ['tenantfloe', input.workloadType.toLowerCase()],
       },
     };
 

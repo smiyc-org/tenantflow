@@ -18,7 +18,7 @@ export function renderDailySummary(kpi: ReportKpiDto): string {
   .kpi-label { font-size: 12px; color: #666; }
 </style></head>
 <body>
-  <h2>Access Concierge — Daily Summary</h2>
+  <h2>TenantFloe — Daily Summary</h2>
   <p>Period: <strong>${kpi.period.from.slice(0, 10)}</strong> to <strong>${kpi.period.to.slice(0, 10)}</strong></p>
 
   <div>
@@ -59,7 +59,7 @@ export function renderDailySummary(kpi: ReportKpiDto): string {
   </table>
 
   <p style="font-size:11px;color:#999;margin-top:32px;">
-    Sent by Access Concierge · Manage subscriptions in the portal
+    Sent by TenantFloe · Manage subscriptions in the portal
   </p>
 </body>
 </html>`;

@@ -47,7 +47,7 @@ export function startNotificationWorker(db: pg.Pool): Worker {
 
         await emailSender.send({
           to: [stage.approver_email],
-          subject: `[Access Concierge] Approval Required — ${request['request_number']}`,
+          subject: `[TenantFloe] Approval Required — ${request['request_number']}`,
           html: buildApprovalEmailHtml(request, stage.token, config.apiBaseUrl),
         });
       }

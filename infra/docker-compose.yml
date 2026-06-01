@@ -5,14 +5,14 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: accessconcierge
+      POSTGRES_DB: tenantfloe
       POSTGRES_USER: ac
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./postgres/migrations:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ac -d accessconcierge"]
+      test: ["CMD-SHELL", "pg_isready -U ac -d tenantfloe"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -41,7 +41,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      DATABASE_URL: postgresql://ac:${POSTGRES_PASSWORD:-changeme}@postgres:5432/accessconcierge
+      DATABASE_URL: postgresql://ac:${POSTGRES_PASSWORD:-changeme}@postgres:5432/tenantfloe
       REDIS_URL: redis://redis:6379
       ENTRA_TENANT_ID: ${ENTRA_TENANT_ID}
       ENTRA_CLIENT_ID: ${ENTRA_CLIENT_ID}
@@ -55,7 +55,7 @@ services:
       AD_BIND_DN: ${AD_BIND_DN:-}
       AD_BIND_PASSWORD: ${AD_BIND_PASSWORD:-}
       AD_BASE_DN: ${AD_BASE_DN:-}
-      SMTP_FROM: ${SMTP_FROM:-access-concierge@corp.local}
+      SMTP_FROM: ${SMTP_FROM:-tenantfloe@corp.local}
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_USER: ${SMTP_USER:-}

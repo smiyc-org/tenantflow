@@ -13,7 +13,7 @@ export class AccessConciergeBot extends ActivityHandler {
 
       if (text.includes('help')) {
         await context.sendActivity(MessageFactory.text(
-          '**Access Concierge** — I can help you:\n' +
+          '**TenantFloe** — I can help you:\n' +
           '• `approvals` — See your pending approvals\n' +
           '• `status <request-number>` — Check request status\n' +
           '• Open the portal for new requests: ' + (process.env['PORTAL_URL'] ?? 'https://concierge.corp.local'),

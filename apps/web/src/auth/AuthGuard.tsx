@@ -13,7 +13,7 @@ export function AuthGuard({ children }: Props) {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="bg-white p-10 rounded-xl shadow-md text-center max-w-sm w-full">
           <div className="text-4xl mb-4">🔐</div>
-          <h1 className="text-2xl font-semibold text-gray-800 mb-2">Access Concierge</h1>
+          <h1 className="text-2xl font-semibold text-gray-800 mb-2">TenantFloe</h1>
           <p className="text-gray-500 mb-6 text-sm">
             Sign in with your Microsoft account to continue.
           </p>
