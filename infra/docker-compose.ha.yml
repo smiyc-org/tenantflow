@@ -1,0 +1,112 @@
+version: '3.9'
+
+# High-availability override for Tier 3 deployments.
+# Usage: docker compose -f docker-compose.yml -f docker-compose.ha.yml up -d
+
+services:
+  api:
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3000/health/live']
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  worker:
+    image: tenantflow-api:latest
+    command: ['node', 'dist/workers/main.js']
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - LICENSE_TIER=${LICENSE_TIER:-3}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - internal
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+
+  postgres:
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=master
+      - POSTGRESQL_REPLICATION_USER=repl_user
+      - POSTGRESQL_REPLICATION_PASSWORD=${POSTGRES_REPL_PASSWORD:-changeme}
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role == db-primary
+
+  postgres-replica:
+    image: postgres:16-alpine
+    environment:
+      - PGUSER=${POSTGRES_USER:-ac}
+      - PGPASSWORD=${POSTGRES_PASSWORD}
+      - PGHOST=postgres
+      - PGDATABASE=${POSTGRES_DB:-accessconcierge}
+    command: >
+      bash -c "
+        pg_basebackup -h postgres -U repl_user -D /var/lib/postgresql/data -P -Xs -R
+        exec postgres
+      "
+    volumes:
+      - postgres_replica_data:/var/lib/postgresql/data
+    depends_on:
+      - postgres
+    networks:
+      - internal
+    deploy:
+      replicas: 1
+
+  redis:
+    command: ['redis-server', '--appendonly', 'yes', '--requirepass', '${REDIS_PASSWORD:-}']
+    deploy:
+      placement:
+        constraints:
+          - node.labels.role == cache
+
+  redis-sentinel-1: &sentinel
+    image: redis:7-alpine
+    command: >
+      sh -c "redis-sentinel /etc/redis/sentinel.conf --sentinel announce-ip $$HOSTNAME"
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+    volumes:
+      - ./redis/sentinel.conf:/etc/redis/sentinel.conf:ro
+    networks:
+      - internal
+    depends_on:
+      - redis
+
+  redis-sentinel-2:
+    <<: *sentinel
+
+  redis-sentinel-3:
+    <<: *sentinel
+
+  nginx:
+    deploy:
+      replicas: 2
+    configs:
+      - source: nginx_conf
+        target: /etc/nginx/nginx.conf
+
+volumes:
+  postgres_replica_data:
+
+configs:
+  nginx_conf:
+    file: ./nginx/nginx.conf
+
+networks:
+  internal:
+    driver: overlay
+    attachable: true
