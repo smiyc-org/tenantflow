@@ -1,0 +1,131 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: tenantfloe
+      POSTGRES_USER: ac
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ac -d tenantfloe"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+  api:
+    build:
+      context: ..
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://ac:${POSTGRES_PASSWORD:-changeme}@postgres:5432/tenantfloe
+      REDIS_URL: redis://redis:6379
+      ENTRA_TENANT_ID: ${ENTRA_TENANT_ID}
+      ENTRA_CLIENT_ID: ${ENTRA_CLIENT_ID}
+      ENTRA_CERT_PATH: /app/certs/entra.pem
+      ENTRA_CERT_THUMBPRINT: ${ENTRA_CERT_THUMBPRINT}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      JWT_SECRET: ${JWT_SECRET}
+      SESSION_SECRET: ${SESSION_SECRET}
+      LICENSE_TIER: ${LICENSE_TIER:-1}
+      AD_LDAP_URL: ${AD_LDAP_URL:-}
+      AD_BIND_DN: ${AD_BIND_DN:-}
+      AD_BIND_PASSWORD: ${AD_BIND_PASSWORD:-}
+      AD_BASE_DN: ${AD_BASE_DN:-}
+      SMTP_FROM: ${SMTP_FROM:-tenantfloe@corp.local}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      API_BASE_URL: ${API_BASE_URL:-https://concierge.corp.local}
+    volumes:
+      - ./certs:/app/certs:ro
+      - uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:3000/health/ready || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+  bot:
+    build:
+      context: ..
+      dockerfile: apps/bot/Dockerfile
+    restart: unless-stopped
+    environment:
+      BOT_APP_ID: ${BOT_APP_ID:-}
+      BOT_APP_PASSWORD: ${BOT_APP_PASSWORD:-}
+      API_BASE_URL: http://api:3000
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - internal
+    profiles:
+      - tier2
+      - tier3
+
+  web:
+    build:
+      context: ..
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    networks:
+      - frontend
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - api
+      - web
+    networks:
+      - internal
+      - frontend
+
+volumes:
+  postgres_data:
+  redis_data:
+  uploads:
+
+networks:
+  internal:
+    driver: bridge
+  frontend:
+    driver: bridge

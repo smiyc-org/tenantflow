@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+.env.local
+*.pem
+*.pfx
+infra/nginx/ssl/
+infra/postgres/data/
+coverage/
+.turbo/
+*.log

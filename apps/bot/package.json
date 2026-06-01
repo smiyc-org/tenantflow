@@ -1,0 +1,25 @@
+{
+  "name": "@tenantflow/bot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/main.ts",
+    "start": "node dist/main.js",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "botbuilder": "^4.23.1",
+    "express": "^4.21.0",
+    "@tenantflow/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.5.4",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4"
+  }
+}
